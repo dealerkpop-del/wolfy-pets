@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wolfy Pets</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <h1>🐺 Wolfy Pets</h1>
+    <div id="status">Conectando...</div>
+    
+    <div id="tutorial-phase" style="display: none;">
+      <h2>Batalla de Tutorial</h2>
+      <p>¡Derrota al dummy azul para desbloquear más pets!</p>
+      <div id="tutorial-battle">
+        <div id="tutorial-enemy"></div>
+        <div id="tutorial-player"></div>
+      </div>
+      <div id="tutorial-log"></div>
+      <button id="start-tutorial">Iniciar Batalla</button>
+    </div>
+
+    <div id="reward-phase" style="display: none;">
+      <h2>¡Victoria! Elige tu recompensa</h2>
+      <p>Selecciona 1 pet para agregar a tu colección:</p>
+      <div id="reward-options"></div>
+    </div>
+
+    <div id="selection-phase" style="display: none;">
+      <h2>Selecciona tu equipo (3 pets)</h2>
+      <div id="collected-pets"></div>
+      <h3>Tu equipo:</h3>
+      <div id="selected-team"></div>
+      <button id="confirm-team" disabled>Confirmar y Buscar Oponente</button>
+    </div>
+
+    <div id="matchmaking-phase" style="display: none;">
+      <h2>Buscando oponente...</h2>
+      <div class="loader"></div>
+    </div>
+
+    <div id="battle-phase" style="display: none;">
+      <h2>¡Batalla!</h2>
+      <div id="opponent-team"></div>
+      <div id="battle-log"></div>
+      <div id="your-team"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
