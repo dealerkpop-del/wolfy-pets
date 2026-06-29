@@ -1,0 +1,148 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#app {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+h1 { text-align: center; color: #333; margin-bottom: 20px; }
+h2 { color: #667eea; margin-bottom: 15px; }
+h3 { color: #666; margin: 15px 0 10px; text-align: center; }
+
+#status {
+  text-align: center;
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.pet {
+  display: inline-block;
+  width: 120px;
+  height: 140px;
+  margin: 10px;
+  border: 3px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.pet:hover {
+  transform: scale(1.05);
+  border-color: #667eea;
+}
+
+.pet.selected {
+  border-color: #4CAF50;
+  background: #e8f5e9;
+}
+
+.pet-body {
+  width: 60px;
+  height: 60px;
+  margin: 10px auto;
+  border-radius: 50%;
+  position: relative;
+}
+
+.pet-name { font-size: 14px; font-weight: bold; margin: 5px 0; }
+.pet-stats { font-size: 12px; font-weight: bold; margin-top: 5px; }
+.hp { color: #e74c3c; }
+.atk { color: #3498db; }
+
+.pet-gray .pet-body { background: #95a5a6; }
+.pet-blue .pet-body { background: #74b9ff; width: 40px; height: 40px; }
+.pet-green .pet-body { background: #00b894; }
+.pet-green .pet-body::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 15px;
+  background: #fdcb6e;
+  border-radius: 50% 50% 0 0;
+}
+
+#tutorial-battle {
+  display: flex;
+  justify-content: space-around;
+  margin: 30px 0;
+}
+
+#tutorial-log, #battle-log {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 20px 0;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+button {
+  display: block;
+  margin: 20px auto;
+  padding: 15px 30px;
+  font-size: 18px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover:not(:disabled) { background: #5568d3; }
+button:disabled { background: #ccc; cursor: not-allowed; }
+
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #667eea;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#collected-pets, #selected-team, #your-team, #opponent-team, #reward-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.reward-pet:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
