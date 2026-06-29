@@ -17,8 +17,8 @@ function setupTutorial() {
   tutorialPet = { id: 'gray', name: 'Tu Tanque', hp: 7, maxHp: 7, atk: 3, color: 'gray' };
   tutorialEnemy = { id: 'blue', name: 'Dummy Azul', hp: 3, maxHp: 3, atk: 3, color: 'blue' };
   
-  document.getElementById('tutorial-player').appendChild(createPetElement(tutorialPet));
-  document.getElementById('tutorial-enemy').appendChild(createPetElement(tutorialEnemy));
+  document.getElementById('tutorial-player').appendChild(createPetElement(tutorialPet, 't-player'));
+  document.getElementById('tutorial-enemy').appendChild(createPetElement(tutorialEnemy, 't-enemy'));
 }
 
 document.getElementById('start-tutorial').onclick = () => {
@@ -35,14 +35,14 @@ function runTutorialBattle() {
     
     if (tutorialPet.hp > 0 && tutorialEnemy.hp > 0) {
       tutorialEnemy.hp -= tutorialPet.atk;
+      updatePetHP('t-enemy', tutorialEnemy.hp);
       log.innerHTML += `<div>${tutorialPet.name} ataca a ${tutorialEnemy.name} por ${tutorialPet.atk} daño</div>`;
-      log.innerHTML += `<div>${tutorialEnemy.name} HP: ${Math.max(0, tutorialEnemy.hp)}/${tutorialEnemy.maxHp}</div>`;
     }
     
     if (tutorialPet.hp > 0 && tutorialEnemy.hp > 0) {
       tutorialPet.hp -= tutorialEnemy.atk;
+      updatePetHP('t-player', tutorialPet.hp);
       log.innerHTML += `<div>${tutorialEnemy.name} ataca a ${tutorialPet.name} por ${tutorialEnemy.atk} daño</div>`;
-      log.innerHTML += `<div>${tutorialPet.name} HP: ${Math.max(0, tutorialPet.hp)}/${tutorialPet.maxHp}</div>`;
     }
     
     if (tutorialEnemy.hp <= 0) {
@@ -57,7 +57,7 @@ function runTutorialBattle() {
     
     turn++;
     log.scrollTop = log.scrollHeight;
-  }, 1500);
+  }, 2000); // Más lento (2 segundos por turno)
 }
 
 socket.on('show-reward', (data) => {
@@ -106,7 +106,8 @@ function togglePetSelection(pet, index, element) {
   }
   
   updateSelectedTeamDisplay();
-  document.getElementById('confirm-team').disabled = selectedTeam.length === 0;
+  // Permitir buscar rival con al menos 1 pet
+  document.getElementById('confirm-team').disabled = selectedTeam.length === 0; 
 }
 
 function updateSelectedTeamDisplay() {
@@ -145,8 +146,8 @@ function displayBattleTeams(data) {
   yourTeamDiv.innerHTML = '<h3>Tu equipo</h3>';
   opponentTeamDiv.innerHTML = '<h3>Oponente</h3>';
   
-  selectedTeam.forEach(pet => yourTeamDiv.appendChild(createPetElement(pet)));
-  data.opponentTeam.forEach(pet => opponentTeamDiv.appendChild(createPetElement(pet)));
+  selectedTeam.forEach((pet, i) => yourTeamDiv.appendChild(createPetElement(pet, `your-${i}`)));
+  data.opponentTeam.forEach((pet, i) => opponentTeamDiv.appendChild(createPetElement(pet, `enemy-${i}`)));
 }
 
 function runBattle(data) {
@@ -159,18 +160,28 @@ function runBattle(data) {
   const interval = setInterval(() => {
     log.innerHTML += `<div><strong>--- Turno ${turn} ---</strong></div>`;
     
-    yourTeam.forEach(pet => {
+    yourTeam.forEach((pet, i) => {
       if (pet.hp > 0 && enemyTeam.some(e => e.hp > 0)) {
         const target = enemyTeam.find(e => e.hp > 0);
+        const targetIndex = enemyTeam.indexOf(target);
+        
         target.hp -= pet.atk;
+        if(target.hp < 0) target.hp = 0;
+        
+        updatePetHP(`enemy-${targetIndex}`, target.hp);
         log.innerHTML += `<div>${pet.name} ataca a ${target.name} por ${pet.atk} daño</div>`;
       }
     });
     
-    enemyTeam.forEach(pet => {
+    enemyTeam.forEach((pet, i) => {
       if (pet.hp > 0 && yourTeam.some(e => e.hp > 0)) {
         const target = yourTeam.find(e => e.hp > 0);
+        const targetIndex = yourTeam.indexOf(target);
+        
         target.hp -= pet.atk;
+        if(target.hp < 0) target.hp = 0;
+        
+        updatePetHP(`your-${targetIndex}`, target.hp);
         log.innerHTML += `<div>${pet.name} ataca a ${target.name} por ${pet.atk} daño</div>`;
       }
     });
@@ -180,19 +191,64 @@ function runBattle(data) {
     
     if (yourAlive === 0 || enemyAlive === 0) {
       clearInterval(interval);
-      log.innerHTML += yourAlive > 0 
-        ? `<div><strong>¡Victoria!</strong></div>` 
-        : `<div><strong>Derrota...</strong></div>`;
+      if (yourAlive > 0) {
+        log.innerHTML += `<div><strong>¡Victoria!</strong></div>`;
+        socket.emit('battle-won', data.opponentTeam); 
+      } else {
+        log.innerHTML += `<div><strong>Derrota... Volviendo al menú en 3s.</strong></div>`;
+        setTimeout(() => location.reload(), 3000);
+      }
     }
     
     turn++;
     log.scrollTop = log.scrollHeight;
-  }, 1500);
+  }, 2500); // Batalla más lenta (2.5 segundos por turno)
 }
 
-function createPetElement(pet) {
+// Función para animar el cambio de HP en el DOM
+function updatePetHP(elementId, newHp) {
+  const el = document.getElementById(`pet-${elementId}`);
+  if (el) {
+    const hpSpan = el.querySelector('.hp');
+    if (hpSpan) {
+      hpSpan.textContent = `❤️${newHp}`;
+      // Efecto visual de daño
+      el.style.transform = 'scale(0.95)';
+      setTimeout(() => el.style.transform = 'scale(1)', 150);
+    }
+  }
+}
+
+// --- NUEVO: Eventos de Clonación ---
+socket.on('show-clone-options', (data) => {
+  document.getElementById('battle-phase').style.display = 'none';
+  document.getElementById('clone-phase').style.display = 'block';
+  
+  const options = document.getElementById('clone-options');
+  options.innerHTML = '';
+  
+  data.opponentTeam.forEach(pet => {
+    const petDiv = createPetElement(pet);
+    petDiv.classList.add('reward-pet');
+    petDiv.onclick = () => socket.emit('select-clone', pet);
+    options.appendChild(petDiv);
+  });
+});
+
+socket.on('clone-success', (data) => {
+  document.getElementById('clone-phase').style.display = 'none';
+  document.getElementById('selection-phase').style.display = 'block';
+  
+  collectedPets = data.collectedPets;
+  displayCollectedPets();
+});
+// -----------------------------------
+
+function createPetElement(pet, idSuffix = '') {
   const div = document.createElement('div');
   div.className = `pet pet-${pet.color}`;
+  if (idSuffix) div.id = `pet-${idSuffix}`;
+  
   div.innerHTML = `
     <div class="pet-body"></div>
     <div class="pet-name">${pet.name}</div>
