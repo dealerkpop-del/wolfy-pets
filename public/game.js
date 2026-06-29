@@ -194,11 +194,14 @@ function runBattle(data) {
       if (yourAlive > 0) {
         log.innerHTML += `<div><strong>¡Victoria!</strong></div>`;
         socket.emit('battle-won', data.opponentTeam); 
-      } else {
+     } else {
         log.innerHTML += `<div><strong>Derrota... Volviendo al menú en 3s.</strong></div>`;
-        setTimeout(() => location.reload(), 3000);
+        setTimeout(() => {
+          document.getElementById('battle-phase').style.display = 'none';
+          document.getElementById('selection-phase').style.display = 'block';
+          document.getElementById('status').textContent = '¡Conectado!';
+        }, 3000);
       }
-    }
     
     turn++;
     log.scrollTop = log.scrollHeight;
