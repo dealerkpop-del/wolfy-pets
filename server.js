@@ -89,6 +89,20 @@ io.on('connection', (socket) => {
     }
   });
 
+  // --- NUEVO: Sistema de Clonación ---
+  socket.on('battle-won', (opponentTeam) => {
+    socket.emit('show-clone-options', { opponentTeam });
+  });
+
+  socket.on('select-clone', (petToClone) => {
+    const data = playerData.get(socket.id);
+    const clonedPet = { ...petToClone, id: petToClone.id + '_clone_' + Date.now() }; 
+    data.collectedPets.push(clonedPet);
+    data.phase = 'selection';
+    socket.emit('clone-success', { collectedPets: data.collectedPets });
+  });
+  // -----------------------------------
+
   socket.on('disconnect', () => {
     console.log('Jugador desconectado:', socket.id);
     waitingPlayers = waitingPlayers.filter(p => p.id !== socket.id);
