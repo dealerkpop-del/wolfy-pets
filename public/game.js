@@ -106,7 +106,7 @@ function togglePetSelection(pet, index, element) {
   }
   
   updateSelectedTeamDisplay();
-  document.getElementById('confirm-team').disabled = selectedTeam.length !== 3;
+  document.getElementById('confirm-team').disabled = selectedTeam.length !== 0;
 }
 
 function updateSelectedTeamDisplay() {
