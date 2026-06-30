@@ -57,7 +57,7 @@ function runTutorialBattle() {
     
     turn++;
     log.scrollTop = log.scrollHeight;
-  }, 2000); // Más lento (2 segundos por turno)
+  }, 2000);
 }
 
 socket.on('show-reward', (data) => {
@@ -106,7 +106,6 @@ function togglePetSelection(pet, index, element) {
   }
   
   updateSelectedTeamDisplay();
-  // Permitir buscar rival con al menos 1 pet
   document.getElementById('confirm-team').disabled = selectedTeam.length === 0; 
 }
 
@@ -194,44 +193,37 @@ function runBattle(data) {
       if (yourAlive > 0) {
         log.innerHTML += `<div><strong>¡Victoria!</strong></div>`;
         socket.emit('battle-won', data.opponentTeam); 
-   } else {
+      } else {
         log.innerHTML += `<div><strong>Derrota... Volviendo al menú en 3s.</strong></div>`;
         setTimeout(() => {
-          // Ocultar batalla
           document.getElementById('battle-phase').style.display = 'none';
-          // Mostrar selección
           document.getElementById('selection-phase').style.display = 'block';
-          // Actualizar status
           document.getElementById('status').textContent = '¡Conectado! Arma tu equipo';
-          // Resetear equipo seleccionado
           selectedTeam = [];
           document.getElementById('selected-team').innerHTML = '';
           document.getElementById('confirm-team').disabled = true;
-          // Mostrar pets coleccionados
           displayCollectedPets();
         }, 3000);
       }
+    }
     
     turn++;
     log.scrollTop = log.scrollHeight;
-  }, 2500); // Batalla más lenta (2.5 segundos por turno)
+  }, 2500);
 }
 
-// Función para animar el cambio de HP en el DOM
 function updatePetHP(elementId, newHp) {
   const el = document.getElementById(`pet-${elementId}`);
   if (el) {
     const hpSpan = el.querySelector('.hp');
     if (hpSpan) {
       hpSpan.textContent = `❤️${newHp}`;
-      // Efecto visual de daño
       el.style.transform = 'scale(0.95)';
       setTimeout(() => el.style.transform = 'scale(1)', 150);
     }
   }
 }
 
-// --- NUEVO: Eventos de Clonación ---
 socket.on('show-clone-options', (data) => {
   document.getElementById('battle-phase').style.display = 'none';
   document.getElementById('clone-phase').style.display = 'block';
@@ -254,7 +246,6 @@ socket.on('clone-success', (data) => {
   collectedPets = data.collectedPets;
   displayCollectedPets();
 });
-// -----------------------------------
 
 function createPetElement(pet, idSuffix = '') {
   const div = document.createElement('div');
