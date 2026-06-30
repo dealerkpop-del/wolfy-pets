@@ -194,12 +194,21 @@ function runBattle(data) {
       if (yourAlive > 0) {
         log.innerHTML += `<div><strong>¡Victoria!</strong></div>`;
         socket.emit('battle-won', data.opponentTeam); 
-     } else {
+   } else {
         log.innerHTML += `<div><strong>Derrota... Volviendo al menú en 3s.</strong></div>`;
         setTimeout(() => {
+          // Ocultar batalla
           document.getElementById('battle-phase').style.display = 'none';
+          // Mostrar selección
           document.getElementById('selection-phase').style.display = 'block';
-          document.getElementById('status').textContent = '¡Conectado!';
+          // Actualizar status
+          document.getElementById('status').textContent = '¡Conectado! Arma tu equipo';
+          // Resetear equipo seleccionado
+          selectedTeam = [];
+          document.getElementById('selected-team').innerHTML = '';
+          document.getElementById('confirm-team').disabled = true;
+          // Mostrar pets coleccionados
+          displayCollectedPets();
         }, 3000);
       }
     
